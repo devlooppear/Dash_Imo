@@ -4,9 +4,12 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 import psycopg2
 
-def Init_Psycopg():
+def Browser_Concet():
     servico = Service(ChromeDriverManager().install())
     navegador = webdriver.Chrome(service=servico)
+    return navegador
+
+def Init_Psycopg():
 
     conn = psycopg2.connect(
             database="Dash_Imo",
@@ -19,7 +22,7 @@ def Init_Psycopg():
     conn.autocommit = True
 
     cursor = conn.cursor()
-    return cursor, navegador
+    return cursor
 
 def Criar_Tabela(cursor):
     sql = 'DROP TABLE IF EXISTS imobiliaria'
@@ -114,57 +117,58 @@ def Achar_Tratar_Inserir(navegador,cursor):
             if vlr_p != " ":
                 titulos_p_vp.append(vlr_p)
     
-    for cam,a,b,c,d,e,f,d in list(zip(titulos_cam,titulos_liq_dia,titulos_ult_rend,titulos_div_yield,titulos_pat_liq,titulos_pat,titulos_ren_mes,titulos_p_vp)):
+        for cam,a,b,c,d,e,f,d in list(zip(titulos_cam,titulos_liq_dia,titulos_ult_rend,titulos_div_yield,titulos_pat_liq,titulos_pat,titulos_ren_mes,titulos_p_vp)):
 
-        for a in titulos_liq_dia:
-            a = str(a)
-            a = a.replace(".","")
-            print(a)
-        
-        for b in titulos_ult_rend:
-            b = str(b)
-            b = b.replace(",",".").replace("R","").replace("$","").replace(" ","")
-            print(b)
-
-        for c in titulos_div_yield:
-            c = str(c)
-            c = c.replace(",",".").replace("%","")
-            print(c)
-
+            for a in titulos_liq_dia:
+                a = str(a)
+                a = a.replace(".","")
+                print(a)
             
-        for d in titulos_pat_liq:
-            d = str(d)
-            if "mi" in d:
-                d = d.replace(",",".").replace("R","").replace("$","").replace(" ","").replace("mi","").replace(".","").replace("bi","")
-                nv_tmn = 9-len(d)
-                d = d.replace(d,d + '0'*nv_tmn)
-            elif "bi" in d:
-                d = d.replace(",",".").replace("R","").replace("$","").replace(" ","").replace("mi","").replace(".","").replace("bi","")
-                nv_tmn = 12-len(d)
-                d = d.replace(d,d + '0'*nv_tmn)
-            else:
-                d = d.replace(",",".").replace("R","").replace("$","").replace(" ","").replace("mi","").replace(".","").replace("bi","")
-            print(d)
+            for b in titulos_ult_rend:
+                b = str(b)
+                b = b.replace(",",".").replace("R","").replace("$","").replace(" ","")
+                print(b)
 
-        for e in titulos_pat:
-            e = str(e)
-            e = e.replace(",",".").replace("R","").replace("$","").replace(" ","")
-            print(e)
+            for c in titulos_div_yield:
+                c = str(c)
+                c = c.replace(",",".").replace("%","")
+                print(c)
 
-        for f in titulos_ren_mes:
-            f = str(f)
-            f = f.replace(",",".").replace("%","")
-            print(f)
-        for g in titulos_p_vp:
-            g = str(g)
-            g = g.replace(",",".")
-            print(g)
+                
+            for d in titulos_pat_liq:
+                d = str(d)
+                if "mi" in d:
+                    d = d.replace(",",".").replace("R","").replace("$","").replace(" ","").replace("mi","").replace(".","").replace("bi","")
+                    nv_tmn = 9-len(d)
+                    d = d.replace(d,d + '0'*nv_tmn)
+                elif "bi" in d:
+                    d = d.replace(",",".").replace("R","").replace("$","").replace(" ","").replace("mi","").replace(".","").replace("bi","")
+                    nv_tmn = 12-len(d)
+                    d = d.replace(d,d + '0'*nv_tmn)
+                else:
+                    d = d.replace(",",".").replace("R","").replace("$","").replace(" ","").replace("mi","").replace(".","").replace("bi","")
+                print(d)
 
-        sql = f'''INSERT INTO imobiliaria (nomes_cam,liq_dia,ult_rend,div_yield,pat_liq,vlr_pat,ren_mes,p_vp) VALUES ('{cam}','{int(a)}','{float(b)}','{float(c)}','{int(d)}','{float(e)}','{float(f)}','{float(g)}')'''
-        cursor.execute(sql)
+            for e in titulos_pat:
+                e = str(e)
+                e = e.replace(",",".").replace("R","").replace("$","").replace(" ","")
+                print(e)
+
+            for f in titulos_ren_mes:
+                f = str(f)
+                f = f.replace(",",".").replace("%","")
+                print(f)
+            for g in titulos_p_vp:
+                g = str(g)
+                g = g.replace(",",".")
+                print(g)
+
+            sql = f'''INSERT INTO imobiliaria (nomes_cam,liq_dia,ult_rend,div_yield,pat_liq,vlr_pat,ren_mes,p_vp) VALUES ('{cam}','{int(a)}','{float(b)}','{float(c)}','{int(d)}','{float(e)}','{float(f)}','{float(g)}')'''
+            cursor.execute(sql)
 
 def main():
 
+    navegador = Browser_Concet()
     cursor, navegador = Init_Psycopg()
     Criar_Tabela(cursor)
     Achar_Tratar_Inserir(navegador,cursor)
